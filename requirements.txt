@@ -1,0 +1,5 @@
+obsws-python>=1.8.0,<2.0
+customtkinter>=5.2.2,<6.0
+pystray>=0.19.5,<1.0
+Pillow==12.2.0
+winotify>=1.1.0,<2.0

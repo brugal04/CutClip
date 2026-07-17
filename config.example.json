@@ -1,0 +1,20 @@
+{
+  "obs_host": "127.0.0.1",
+  "obs_port": 4455,
+  "obs_password": "",
+  "clips_folder": "C:\\Users\\TU_USUARIO\\Videos\\CutClip",
+  "short_clip_seconds": 180,
+  "long_clip_seconds": 600,
+  "short_hotkey": "F1",
+  "long_hotkey": "SHIFT+F1",
+  "ffmpeg_path": "ffmpeg",
+  "auto_start_replay_buffer": true,
+  "auto_connect": true,
+  "auto_reconnect": true,
+  "reconnect_interval": 5,
+  "minimize_to_tray": true,
+  "show_tray_notice": true,
+  "start_with_windows": false,
+  "silent_start": false,
+  "notifications_enabled": true
+}

@@ -1,0 +1,32 @@
+# Entorno virtual
+.venv/
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compilación
+build/
+dist/
+*.spec.bak
+
+# PyInstaller
+*.manifest
+
+# Logs
+*.log
+logs/
+
+# Configuración local
+config.json
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Inno Setup
+installer/output/
