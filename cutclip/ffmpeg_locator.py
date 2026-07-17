@@ -1,9 +1,4 @@
-"""Detección ligera de FFmpeg.
-
-La búsqueda se hace una sola vez al cargar la configuración. Se prioriza una
-copia incluida junto a la aplicación y después la instalación disponible en
-PATH. No se descarga nada ni se ejecutan procesos durante la detección.
-"""
+"""Localización fiable de FFmpeg en desarrollo y en ejecutables empaquetados."""
 
 from __future__ import annotations
 
@@ -12,29 +7,46 @@ import sys
 from pathlib import Path
 
 
+def application_root() -> Path:
+    """Devuelve la carpeta física de CutClip o del ejecutable instalado."""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parents[1]
+
+
 def resource_root() -> Path:
-    """Devuelve la raíz de recursos en fuente o en un ejecutable PyInstaller."""
-    return Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
+    """Devuelve la raíz temporal de recursos utilizada por PyInstaller."""
+    return Path(getattr(sys, "_MEIPASS", application_root()))
+
+
+def ffmpeg_candidates(configured_path: str = "") -> list[Path]:
+    """Construye candidatos ordenados sin ejecutar procesos externos."""
+    candidates: list[Path] = []
+    if configured_path and configured_path.lower() != "ffmpeg":
+        candidates.append(Path(configured_path).expanduser())
+
+    # En el instalador FFmpeg queda junto al EXE; en one-file también puede
+    # encontrarse dentro de _MEIPASS. Se admiten ambas disposiciones.
+    for base in (application_root(), resource_root()):
+        candidates.extend((
+            base / "ffmpeg" / "ffmpeg.exe",
+            base / "tools" / "ffmpeg" / "ffmpeg.exe",
+            base / "ffmpeg.exe",
+        ))
+    return candidates
 
 
 def find_ffmpeg(configured_path: str = "") -> str:
-    """Devuelve la mejor ruta disponible de FFmpeg.
-
-    Conserva una ruta configurada válida, busca una copia portable en
-    ``ffmpeg/ffmpeg.exe`` y, como último recurso, consulta el PATH de Windows.
-    Si no encuentra nada devuelve ``ffmpeg`` para mantener compatibilidad con
-    instalaciones que se agreguen al PATH después de iniciar CutClip.
-    """
-    if configured_path:
-        configured = Path(configured_path).expanduser()
-        if configured.is_file():
-            return str(configured)
-        if configured_path.lower() == "ffmpeg" and shutil.which("ffmpeg"):
-            return shutil.which("ffmpeg") or "ffmpeg"
-
-    portable = resource_root() / "ffmpeg" / "ffmpeg.exe"
-    if portable.is_file():
-        return str(portable)
+    """Devuelve la mejor ruta disponible o ``ffmpeg`` como último recurso."""
+    for candidate in ffmpeg_candidates(configured_path):
+        if candidate.is_file():
+            return str(candidate.resolve())
 
     discovered = shutil.which("ffmpeg")
     return discovered or "ffmpeg"
+
+
+def ffmpeg_is_available(configured_path: str = "") -> bool:
+    """Indica si CutClip puede ejecutar FFmpeg en este momento."""
+    resolved = find_ffmpeg(configured_path)
+    return Path(resolved).is_file() or shutil.which(resolved) is not None

@@ -5,8 +5,8 @@ legales. Mantenerlos aquí evita inconsistencias entre la interfaz y los logs.
 """
 
 APP_NAME = "CutClip"
-APP_VERSION = "1.0.0"
-APP_BUILD = "2026.07.17.1"
+APP_VERSION = "1.0.1"
+APP_BUILD = "2026.07.17.2"
 APP_AUTHOR = "Bryant Brugal"
 APP_COPYRIGHT = "© 2026 Bryant Brugal. Todos los derechos reservados."
 APP_TAGLINE = "Instant Replay Manager"

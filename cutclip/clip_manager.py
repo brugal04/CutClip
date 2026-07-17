@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .config import AppConfig
+from .ffmpeg_locator import find_ffmpeg
 
 
 class ClipManager:
@@ -76,17 +77,17 @@ class ClipManager:
         return destination
 
     def _resolve_ffmpeg(self) -> str:
-        """Encuentra FFmpeg por ruta configurada o por PATH."""
-        configured = Path(self.config.ffmpeg_path)
-        if configured.is_file():
-            return str(configured)
-
-        located = shutil.which(self.config.ffmpeg_path)
-        if located:
+        """Encuentra FFmpeg incluido, configurado manualmente o disponible en PATH."""
+        located = find_ffmpeg(self.config.ffmpeg_path)
+        if Path(located).is_file() or shutil.which(located):
+            # Sincroniza la ruta resuelta en memoria para diagnósticos posteriores.
+            self.config.ffmpeg_path = located
             return located
 
         raise FileNotFoundError(
-            "No se encontró FFmpeg. Instálalo o selecciona ffmpeg.exe en Configuración."
+            "El clip rápido (F1) necesita FFmpeg y CutClip no pudo encontrarlo. "
+            "Puedes usar Shift+F1 para guardar el Replay completo o reinstalar "
+            "CutClip v1.0.1 con FFmpeg incluido."
         )
 
     def _unique_destination(self, suffix: str, label: str) -> Path:

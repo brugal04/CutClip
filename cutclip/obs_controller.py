@@ -30,16 +30,12 @@ class OBSController:
         return self._client is not None
 
     def connect(self) -> dict[str, str]:
-        """Conecta con OBS y valida la versión mínima admitida."""
+        """Conecta con OBS y prueba puertos locales conocidos cuando es necesario."""
         with self._lock:
             self.disconnect()
-            client = obs.ReqClient(
-                host=self.config.obs_host,
-                port=int(self.config.obs_port),
-                password=self.config.obs_password,
-                timeout=5,
-            )
-            version = client.get_version()
+            client, version, selected_port = self._connect_with_detection()
+            # Guardar el puerto detectado permite que el próximo inicio sea directo.
+            self.config.obs_port = selected_port
             obs_version = str(getattr(version, "obs_version", "desconocida"))
             websocket_version = str(
                 getattr(version, "obs_web_socket_version", "desconocida")
@@ -63,6 +59,41 @@ class OBSController:
                 "obs_version": obs_version,
                 "websocket_version": websocket_version,
             }
+
+
+    def _connect_with_detection(self) -> tuple[obs.ReqClient, object, int]:
+        """Prueba primero la configuración y luego puertos WebSocket habituales.
+
+        Solo se detectan puertos en localhost para evitar escaneos de red. La
+        contraseña escrita por el usuario se reutiliza en cada intento.
+        """
+        configured_port = int(self.config.obs_port)
+        ports = [configured_port]
+        if self.config.obs_host.strip().lower() in {"127.0.0.1", "localhost", "::1"}:
+            ports.extend(port for port in (4455, 4444, 4456) if port not in ports)
+
+        last_error: Exception | None = None
+        for port in ports:
+            client: obs.ReqClient | None = None
+            try:
+                client = obs.ReqClient(
+                    host=self.config.obs_host,
+                    port=port,
+                    password=self.config.obs_password,
+                    timeout=3,
+                )
+                return client, client.get_version(), port
+            except Exception as exc:
+                last_error = exc
+                if client is not None:
+                    try:
+                        client.disconnect()
+                    except Exception:
+                        pass
+
+        if last_error is not None:
+            raise last_error
+        raise ConnectionError("No se encontró el servidor WebSocket de OBS.")
 
     def ping(self) -> bool:
         """Comprueba la conexión con una solicitud ligera."""

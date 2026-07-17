@@ -27,6 +27,7 @@ from .app_info import (
 )
 from .clip_manager import ClipManager
 from .config import APP_DIR, load_config, save_config
+from .diagnostics import run_local_diagnostics
 from .hotkeys import GlobalHotkeys
 from .notifications import Notifier
 from .obs_controller import OBSController
@@ -274,6 +275,7 @@ class CutClipApp:
         self.connect_button = ctk.CTkButton(actions, text="Conectar con OBS", height=38, corner_radius=8, fg_color=self.BLUE, hover_color=self.BLUE_HOVER, command=self.connect_obs)
         self.connect_button.pack(side="left")
         ctk.CTkButton(actions, text="Guardar configuración", height=38, corner_radius=8, fg_color=self.PANEL_ALT, hover_color=self.BORDER, command=self.save_visible_config).pack(side="left", padx=8)
+        ctk.CTkButton(actions, text="Diagnóstico", height=38, corner_radius=8, fg_color=self.PANEL_ALT, hover_color=self.BORDER, command=self.show_diagnostics).pack(side="left")
         ctk.CTkButton(actions, text="Abrir clips", height=38, corner_radius=8, fg_color=self.PANEL_ALT, hover_color=self.BORDER, command=self.open_output_folder).pack(side="right")
 
     def _add_field(self, parent: ctk.CTkFrame, label: str, variable: ctk.StringVar, row: int, column: int) -> None:
@@ -477,6 +479,15 @@ class CutClipApp:
     def _threadsafe_status(self, message: str) -> None:
         self.events.put(("status", message))
 
+
+    def show_diagnostics(self) -> None:
+        """Muestra un reporte sencillo que el usuario puede comprender o copiar."""
+        items = run_local_diagnostics(self.config, self.controller.connected and self.controller.ping())
+        lines = [f"{'✅' if item.ok else '❌'} {item.name}: {item.detail}" for item in items]
+        overall = all(item.ok for item in items)
+        lines.extend(("", "Estado general: " + ("LISTO PARA USAR" if overall else "REQUIERE ATENCIÓN")))
+        messagebox.showinfo(f"Diagnóstico de {APP_NAME}", "\n".join(lines), parent=self.root)
+
     def choose_output_folder(self) -> None:
         selected = filedialog.askdirectory(initialdir=self.folder_var.get() or str(Path.home()))
         if selected:
@@ -609,8 +620,12 @@ class CutClipApp:
         lowered = message.lower()
         if "authentication" in lowered or "password" in lowered:
             return "No se pudo autenticar con OBS. Revisa la contraseña del servidor WebSocket."
-        if "connection refused" in lowered or "actively refused" in lowered:
-            return "No se pudo conectar con OBS. Verifica que OBS esté abierto y que WebSocket esté activado."
+        if "connection refused" in lowered or "actively refused" in lowered or "no se encontró el servidor" in lowered:
+            return ("No se encontró OBS WebSocket. Abre OBS y entra en Herramientas → "
+                    "Configuración del servidor WebSocket para activarlo.")
+        if "ffmpeg" in lowered:
+            return ("F1 necesita FFmpeg para recortar el clip. Reinstala CutClip v1.0.1 "
+                    "con FFmpeg incluido. Mientras tanto, Shift+F1 guarda el Replay completo.")
         if "timed out" in lowered or "timeout" in lowered:
             return "OBS tardó demasiado en responder. Comprueba la conexión y vuelve a intentar."
         return message or "Ocurrió un error inesperado. Revisa la carpeta de logs."

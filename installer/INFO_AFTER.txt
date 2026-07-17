@@ -1,0 +1,9 @@
+CutClip se instalo correctamente.
+
+Al abrirlo por primera vez:
+1. Confirma el servidor, puerto y contrasena de OBS WebSocket.
+2. Selecciona la carpeta donde guardar los clips.
+3. Verifica que FFmpeg haya sido detectado.
+4. Prueba F1 y Shift + F1 con Replay Buffer activo.
+
+CutClip es una aplicacion independiente compatible con OBS Studio.

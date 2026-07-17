@@ -1,26 +1,34 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 cd /d "%~dp0"
 
+call "DESCARGAR_FFMPEG.bat"
+if errorlevel 1 goto :error
+
 if not exist ".venv\Scripts\python.exe" (
-    echo Ejecuta primero INSTALAR.bat
-    pause
+    echo [ERROR] Ejecuta primero INSTALAR.bat
+    if /I not "%~1"=="nopause" pause
     exit /b 1
 )
 
-".venv\Scripts\python.exe" -m pip install --upgrade pyinstaller
+if exist "build" rmdir /s /q "build"
+if exist "dist\CutClip.exe" del /q "dist\CutClip.exe"
+
+".venv\Scripts\python.exe" -m pip install --upgrade "pyinstaller>=6.0,<7.0"
 if errorlevel 1 goto :error
 
 ".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean "CutClip.spec"
 if errorlevel 1 goto :error
 
+if not exist "dist\CutClip.exe" goto :error
+
 echo.
-echo EXE creado en: dist\CutClip.exe
-pause
+echo [OK] EXE creado en: dist\CutClip.exe
+if /I not "%~1"=="nopause" pause
 exit /b 0
 
 :error
 echo.
-echo No se pudo compilar el EXE.
-pause
+echo [ERROR] No se pudo compilar CutClip.exe.
+if /I not "%~1"=="nopause" pause
 exit /b 1

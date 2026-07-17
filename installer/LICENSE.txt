@@ -1,0 +1,14 @@
+CUTCLIP - LICENCIA DE USO
+Version 1.0.1
+
+Copyright (C) 2026 Bryant Brugal. Todos los derechos reservados.
+
+Se concede permiso para instalar y utilizar CutClip para fines personales o profesionales. No se permite redistribuir, vender, modificar ni presentar el programa como propio sin autorizacion expresa y por escrito del autor.
+
+CutClip se proporciona "tal cual", sin garantias expresas o implicitas. El usuario es responsable de verificar su configuracion de OBS Studio, Replay Buffer, almacenamiento y grabaciones.
+
+INDEPENDENCIA DE OBS STUDIO
+
+CutClip es una aplicacion independiente. No esta afiliada, patrocinada, aprobada ni respaldada por OBS Studio ni por sus desarrolladores. El nombre OBS Studio se utiliza exclusivamente para indicar compatibilidad tecnica.
+
+Al continuar con la instalacion, acepta estas condiciones.

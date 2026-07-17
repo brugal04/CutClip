@@ -1,0 +1,12 @@
+CutClip v1.0.1
+Instant Replay Manager
+
+Compatible con OBS Studio.
+
+CutClip es una aplicacion completamente independiente. No esta afiliada, patrocinada ni respaldada por OBS Studio o sus desarrolladores.
+
+Antes de continuar:
+- OBS Studio debe estar instalado.
+- OBS WebSocket debe estar habilitado.
+- Replay Buffer debe estar configurado.
+- FFmpeg es necesario para recortar los clips.

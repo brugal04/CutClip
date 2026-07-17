@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ======================================================
-echo   CutClip v1.0.0 - Diagnostico
+echo   CutClip v1.0.1 - Diagnostico
  echo ======================================================
 echo.
 

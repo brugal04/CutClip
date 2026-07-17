@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ======================================================
-echo   CutClip v1.0.0 - Instalador de dependencias
+echo   CutClip v1.0.1 - Instalador de dependencias
 echo ======================================================
 echo.
 

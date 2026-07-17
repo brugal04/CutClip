@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 
-APP_USER_MODEL_ID = "BryantBrugal.CutClip.1.0.0"
+APP_USER_MODEL_ID = "BryantBrugal.CutClip.1.0.1"
 
 
 def configure_windows_identity() -> None:

@@ -1,13 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_data_files
 
 datas = [('assets', 'assets')]
+binaries = []
+ffmpeg_binary = 'tools/ffmpeg/ffmpeg.exe'
+if Path(ffmpeg_binary).is_file():
+    binaries.append((ffmpeg_binary, 'ffmpeg'))
 datas += collect_data_files('customtkinter')
 
 a = Analysis(
     ['app.py'],
     pathex=[],
-    binaries=[],
+    binaries=binaries,
     datas=datas,
     hiddenimports=['pystray._win32', 'winotify'],
     hookspath=[],

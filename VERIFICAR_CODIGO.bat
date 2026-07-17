@@ -8,7 +8,7 @@ if not exist ".venv\Scripts\python.exe" (
     exit /b 1
 )
 
-echo Verificando sintaxis de CutClip v1.0.0...
+echo Verificando sintaxis de CutClip v1.0.1...
 ".venv\Scripts\python.exe" -m compileall -q app.py cutclip
 if errorlevel 1 (
     echo ERROR: Se encontraron errores de sintaxis.
